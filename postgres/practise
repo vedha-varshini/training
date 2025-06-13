@@ -1,0 +1,173 @@
+-- 1. DATABASE CREATION
+CREATE DATABASE shopdb;
+
+-- 2. CONNECT TO DATABASE
+\c shopdb
+
+-- 3. TABLE CREATION
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    age INT,
+    email TEXT UNIQUE
+);-
+
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    product TEXT,
+    amount NUMERIC,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. DATA INSERTION TYPES
+--  Simple INSERT
+INSERT INTO users (name, age, email) VALUES ('Alice', 25, 'alice@example.com');
+
+--  Multi-row INSERT
+INSERT INTO users (name, age, email) VALUES
+('Bob', 30, 'bob@example.com'),
+('Charlie', 28, 'charlie@example.com');
+
+--  INSERT using SELECT
+INSERT INTO orders (user_id, product, amount)
+SELECT id, 'Mouse', 500 FROM users WHERE name = 'Bob';
+
+--  INSERT with RETURNING
+INSERT INTO users (name, age, email)
+VALUES ('David', 22, 'david@example.com')
+RETURNING id, name;
+
+-- 5. SELECT STATEMENTS
+--  Basic SELECT
+SELECT * FROM users;
+
+--  Select specific columns
+SELECT name, email FROM users;
+
+--  WHERE clause
+SELECT * FROM users WHERE age > 25;
+
+--  ORDER BY
+SELECT * FROM users ORDER BY age DESC;
+
+--  LIMIT and OFFSET
+SELECT * FROM users ORDER BY id LIMIT 2 OFFSET 1;
+
+--  DISTINCT
+SELECT DISTINCT age FROM users;
+
+--  BETWEEN, IN, LIKE
+SELECT * FROM users WHERE age BETWEEN 20 AND 30;
+SELECT * FROM users WHERE name IN ('Alice', 'Bob');
+SELECT * FROM users WHERE email LIKE '%@example.com';
+
+-- 6. JOIN TYPES
+--  INNER JOIN
+SELECT u.name, o.product
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id;
+
+--  LEFT JOIN
+SELECT u.name, o.product
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id;
+
+-- RIGHT JOIN
+SELECT u.name, o.product
+FROM users u
+RIGHT JOIN orders o ON u.id = o.user_id;
+
+--  FULL OUTER JOIN
+SELECT u.name, o.product
+FROM users u
+FULL OUTER JOIN orders o ON u.id = o.user_id;
+
+--  SELF JOIN
+SELECT a.name AS user1, b.name AS user2
+FROM users a
+JOIN users b ON a.age = b.age AND a.id <> b.id;
+
+--  CROSS JOIN
+SELECT u.name, o.product
+FROM users u
+CROSS JOIN orders o;
+
+--  USING clause
+SELECT u.name, o.product
+FROM users u
+JOIN orders o USING (id);
+
+-- NATURAL JOIN (only if column names match)
+
+-- 7. UPDATE QUERIES
+--  Basic UPDATE
+UPDATE users SET age = 26 WHERE name = 'Alice';
+
+--  UPDATE with multiple columns
+UPDATE users SET age = 29, email = 'charlie2024@example.com' WHERE name = 'Charlie';
+
+--  UPDATE using data from another table
+UPDATE users SET age = u2.age
+FROM (SELECT id, age FROM users WHERE name = 'Bob') AS u2
+WHERE users.id = u2.id;
+
+--  UPDATE with RETURNING
+UPDATE users SET age = age + 1 WHERE id = 1 RETURNING *;
+
+-- 8. DELETE QUERIES
+--  Basic DELETE
+DELETE FROM users WHERE name = 'David';
+
+--  DELETE all rows
+DELETE FROM orders;
+
+--  DELETE with subquery
+DELETE FROM users WHERE id IN (SELECT user_id FROM orders WHERE amount > 50000);
+
+--  DELETE with RETURNING
+DELETE FROM users WHERE name = 'Charlie' RETURNING *;
+
+-- 9. SUBQUERIES
+--  Scalar subquery
+SELECT name FROM users WHERE age = (SELECT MAX(age) FROM users);
+
+--  Row subquery
+SELECT * FROM users WHERE (age, email) = (SELECT age, email FROM users WHERE name = 'Alice');
+
+--  EXISTS subquery
+SELECT name FROM users WHERE EXISTS (
+  SELECT 1 FROM orders WHERE users.id = orders.user_id
+);
+
+--  NOT EXISTS subquery
+SELECT name FROM users WHERE NOT EXISTS (
+  SELECT 1 FROM orders WHERE users.id = orders.user_id
+);
+
+--  IN subquery
+SELECT name FROM users WHERE id IN (SELECT user_id FROM orders);
+
+-- 10. AGGREGATE FUNCTIONS & GROUPING
+--  COUNT, SUM, AVG, MIN, MAX
+SELECT COUNT(*) FROM users;
+SELECT AVG(age) FROM users;
+SELECT SUM(amount) FROM orders;
+SELECT MIN(age), MAX(age) FROM users;
+
+--  GROUP BY
+SELECT user_id, SUM(amount) AS total_spent
+FROM orders
+GROUP BY user_id;
+
+--  GROUP BY with HAVING
+SELECT user_id, SUM(amount) AS total_spent
+FROM orders
+GROUP BY user_id
+HAVING SUM(amount) > 1000;
+
+--  GROUP BY multiple columns
+SELECT user_id, product, COUNT(*) AS count
+FROM orders
+GROUP BY user_id, product;
+
