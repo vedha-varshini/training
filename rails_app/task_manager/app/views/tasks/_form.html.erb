@@ -1,0 +1,74 @@
+<%= form_with(model: task, local: true) do |form| %>
+  <% if task.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
+
+      <ul>
+        <% task.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.label :status %>
+    <%= form.select :status, ['pending', 'completed'] %>
+  </div>
+
+  <div>
+    <%= form.label :due_date %>
+    <%= form.date_field :due_date %>
+  </div>
+
+  <!-- ✅ Your new fields -->
+
+  <div>
+    <%= form.label :priority %>
+    <%= form.number_field :priority %>
+  </div>
+
+  <div>
+    <%= form.label :active %>
+    <%= form.check_box :active %>
+  </div>
+
+  <div>
+    <%= form.label :budget %>
+    <%= form.number_field :budget, step: 0.01 %>
+  </div>
+
+  <div>
+    <%= form.label :attachment %>
+    <%= form.text_field :attachment %>
+  </div>
+
+  <div>
+    <%= form.label :started_at %>
+    <%= form.datetime_local_field :started_at %>
+  </div>
+
+  <div>
+    <%= form.label :rating %>
+    <%= form.number_field :rating, step: 0.1 %>
+  </div>
+
+  <div>
+    <%= form.label :notes %>
+    <%= form.text_area :notes, rows: 4 %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,18 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @task %>
+
+<div>
+  <%= link_to "Edit this task", edit_task_path(@task) %> |
+  <%= link_to "Back to tasks", tasks_path %>
+  <p><strong>Priority:</strong> <%= @task.priority %></p>
+  <p><strong>Active:</strong> <%= @task.active ? "Yes" : "No" %></p>
+  <p><strong>Budget:</strong> ₹<%= @task.budget %></p>
+  <p><strong>Attachment:</strong> <%= @task.attachment %></p>
+  <p><strong>Started At:</strong> <%= @task.started_at&.strftime("%B %d, %Y %H:%M") %></p>
+  <p><strong>Rating:</strong> <%= @task.rating %></p>
+  <p><strong>Notes:</strong> <%= @task.notes %></p>
+
+
+  <%= button_to "Destroy this task", @task, method: :delete %>
+</div>
